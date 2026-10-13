@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRBLACKJACK399 AI V3</title>
+<style>
+  :root{--navy:#0f172a;--gold:#facc15;--blue:#38bdf8}
+  body{font-family:Inter,sans-serif;background:#020617;margin:0;color:white;display:flex;flex-direction:column;height:100vh}
+ .header{background:linear-gradient(90deg,#0f172a,#1e293b);padding:12px 15px;display:flex;align-items:center;gap:12px;border-bottom:2px solid var(--gold)}
+ .header img{width:42px;height:42px;border-radius:50%;border:2px solid var(--gold)}
+ .header h2{margin:0;font-size:16px;color:var(--gold)}.header small{color:var(--blue);font-size:11px}
+ .chat{flex:1;overflow-y:auto;padding:15px;background:#020617;display:flex;flex-direction:column;gap:12px}
+ .msg{max-width:85%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.4}
+ .user{background:var(--blue);color:#020617;align-self:flex-end;border-bottom-right-radius:4px}
+ .ai{background:#1e293b;color:#e2e8f0;align-self:flex-start;border-bottom-left-radius:4px;border:1px solid #334155}
+ .ai img{width:100%;border-radius:10px;margin-top:8px;background:white}
+ .btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+ .btns button{background:var(--gold);color:#020617;border:none;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:bold;cursor:pointer}
+ .btns button.sticker{background:var(--blue)}.btns button.quick{background:#334155;color:white;border:1px solid #475569}
+ .input-area{display:flex;gap:8px;padding:10px;background:#0f172a;border-top:1px solid #1e293b}
+  input{flex:1;padding:12px 14px;border-radius:25px;border:1px solid #334155;background:#1e293b;color:white;outline:none}
+  #kirimBtn{padding:12px 18px;background:var(--gold);color:#020617;border:none;border-radius:25px;font-weight:bold}
+  #setup{padding:30px;text-align:center;background:#0f172a;margin:20px;border-radius:16px;border:1px dashed var(--gold)}
+  #setup input{width:90%;margin:10px 0;background:#020617;padding:12px;border-radius:10px;border:1px solid #334155;color:white}
+  #setup button{background:var(--blue);color:#020617;border:none;padding:12px 25px;border-radius:25px;font-weight:bold;margin-top:10px}
+ .tip{font-size:11px;color:#94a3b8;text-align:center;padding:5px}
+ .typing{display:flex;gap:4px;padding:10px}.typing span{width:8px;height:8px;background:var(--gold);border-radius:50%;animation:bounce 1.4s infinite}
+  @keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+</style>
+</head>
+<body>
+
+<!-- HEADER LU YANG LU MINTA -->
+<div class="header">
+  <img src="https://i.postimg.cc/0yQ1L0yX/mrblackjack399-logo.png" onerror="this.src='https://via.placeholder.com/42/facc15/0f172a?text=M399'">
+  <div><h2>MRBLACKJACK399 AI V3</h2><small>Smart Greeting + Info + Sticker WA</small></div>
+</div>
+
+<div id="setup">
+  <h3 style="color:var(--gold)">Masukin API Key Gemini</h3>
+  <p style="font-size:13px;color:#cbd5e1">Gratis dari aistudio.google.com/app/apikey</p>
+  <input id="apiKey" placeholder="AIzaSy...">
+  <br><button onclick="saveKey()">Simpan & Mulai Chat</button>
+</div>
+
+<div id="chatBox" class="chat" style="display:none"></div>
+<div class="tip" id="tipText" style="display:none">Coba ketik: hai / info stie dp / /gambar kucing</div>
+
+<div class="input-area" id="inputArea" style="display:none">
+  <input id="pesan" placeholder="Ketik hai, info stie dp, /gambar..." onkeydown="if(event.key==='Enter')kirim()">
+  <button id="kirimBtn" onclick="kirim()">Kirim</button>
+</div>
+
+<canvas id="stickerCanvas" width="512" height="512" style="display:none"></canvas>
+
+<!-- FOOTER LU YANG LU MINTA - UDAH GUA TAMBAHIN DI SINI -->
+<div style="background:#0f172a;padding:10px;text-align:center;font-size:11px;color:#94a3b8;border-top:1px solid #1e293b">
+  Made with 🔥 by <a href="https://github.com/MRBLACKJACK399" target="_blank" style="color:#facc15;text-decoration:none;font-weight:bold">MRBLACKJACK399</a> |
+  <a href="https://github.com/MRBLACKJACK399/MRBLACKJACK399-AI-V3" target="_blank" style="color:#38bdf8;text-decoration:none">Source Code</a> |
+  STIE DP Pekanbaru 2026
+</div>
+
+<script>
+let GEMINI_KEY = localStorage.getItem('GEMINI_KEY') || '';
+let chatBox = document.getElementById('chatBox');
+let USER_NAME = localStorage.getItem('USER_NAME') || '';
+const INFO_DATA = {
+  "STIE DP": {
+    title: "🏛️ STIE Dharma Putra Pekanbaru",
+    desc: `STIE Dharma Putra (STIE DP) adalah kampus ekonomi terkemuka di Pekanbaru, Riau.<br><br><b>📚 Program Studi:</b><br>• S1 Manajemen<br>• S1 Akuntansi<br>• S2 Manajemen<br><br><b>📍 Alamat:</b> Jl. K.H. Ahmad Dahlan No. 31, Pekanbaru<br><b>🌐 Website:</b> stie-dp.ac.id<br><b>📞 Kontak:</b> (0761) 23456<br><br><b>✨ Keunggulan:</b><br>• Akreditasi BAN-PT Baik Sekali<br>• Dosen praktisi BPR & Perbankan<br>• Lokasi strategis tengah kota<br>• Cocok untuk karyawan`,
+    prompt_gambar: "logo kampus STIE Dharma Putra Pekanbaru modern gold blue elegant",
+    quick: ["Cara Daftar STIE DP","Biaya Kuliah STIE DP","Jadwal PMB"]
+  },
+  "BPR CEMPAKA": {
+    title: "🏦 BPR Cempaka Pekanbaru",
+    desc: `BPR Cempaka adalah Bank Perekonomian Rakyat terpercaya di Pekanbaru.<br><br><b>💰 Produk:</b><br>• Tabungan Cempaka<br>• Deposito Berjangka<br>• Kredit UMKM & Karyawan<br>• QRIS Merchant<br><br><b>📍 Alamat:</b> Jl. Tuanku Tambusai, Pekanbaru, Riau<br><b>📞 CS:</b> 0761-xxx-xxx<br><b>⏰ Jam:</b> Senin-Jumat 08.00-16.00 WIB<br><br><b>✨ Kenapa BPR Cempaka?</b><br>• Bunga kompetitif<br>• Proses cepat<br>• Diawasi OJK & LPS<br>• Support UMKM Pekanbaru`,
+    prompt_gambar: "logo bank BPR Cempaka gold blue professional banking",
+    quick: ["Bunga Deposito BPR","Cara Buka Tabungan","Syarat Kredit UMKM"]
+  }
+}
+if(GEMINI_KEY){
+  document.getElementById('setup').style.display='none';
+  chatBox.style.display='flex';
+  document.getElementById('inputArea').style.display='flex';
+  document.getElementById('tipText').style.display='block';
+  tambahMsg('ai',`${getTimeGreeting()} ${USER_NAME?USER_NAME+'! 👋':''} <br>Saya <b>MRBLACKJACK399 AI V3</b><br><br>Klik info di bawah:` + genMenuInfo());
+}
+function genMenuInfo(){
+  return `<div class="btns">
+    <button class="quick" onclick="showInfo('STIE DP')" style="background:#facc15;color:#020617">🏛️ Info STIE DP</button>
+    <button class="quick" onclick="showInfo('BPR CEMPAKA')" style="background:#38bdf8;color:#020617">🏦 Info BPR Cempaka</button>
+    <button class="quick" onclick="quickChat('hai')">👋 Sapa AI</button>
+    <button class="quick" onclick="quickChat('/gambar logo keren')">🎨 Bikin Stiker</button>
+  </div>`;
+}
+function getTimeGreeting(){ let jam=new Date().getHours(); if(jam<11)return "Selamat pagi 🌅"; if(jam<15)return "Selamat siang ☀️"; if(jam<18)return "Selamat sore 🌇"; return "Selamat malam 🌙"; }
+function showInfo(key){
+  let data = INFO_DATA[key]; if(!data) return;
+  tambahMsg('user', `Info ${key}`);
+  let html = `<b>${data.title}</b><br><div style="text-align:left;margin:10px 0;padding:10px;background:#0f172a;border-radius:10px;border-left:3px solid var(--gold);font-size:13px">${data.desc}</div>
+  <div class="btns">
+    ${data.quick.map(q=>`<button class="quick" onclick="quickChat('${q}')">${q}</button>`).join('')}
+    <button class="sticker" onclick="buatGambar('${data.prompt_gambar}')">🎨 Jadi Stiker ${key}</button>
+    <button onclick="showInfo('${key==='STIE DP'?'BPR CEMPAKA':'STIE DP'}')">${key==='STIE DP'?'🏦 Lihat BPR Cempaka':'🏛️ Lihat STIE DP'}</button>
+  </div>`;
+  tambahMsg('ai', html);
+}
+function saveKey(){ let k=document.getElementById('apiKey').value.trim(); if(!k) return alert('Isi API Key'); localStorage.setItem('GEMINI_KEY',k); location.reload(); }
+function cekSapaan(text){
+  let t=text.toLowerCase().trim();
+  let list=['hai','halo','hello','hi','hey','pagi','siang','sore','malam','assalamualaikum','salam','test','hallo'];
+  let kata=t.split(' ')[0];
+  if(list.includes(kata) || list.includes(t) || (t.length<=5 && list.some(s=>t.includes(s)))) return true;
+  return /^(hai|halo|hello|hi|hey|assalamualaikum|selamat (pagi|siang|sore|malam))/i.test(t);
+}
+function balasSapaan(text){
+  let waktu=getTimeGreeting(); let t=text.toLowerCase();
+  let namaMatch=text.match(/(?:aku|nama aku|panggil aku|saya)\s+([A-Za-z]+)/i);
+  if(namaMatch){ USER_NAME=namaMatch[1]; localStorage.setItem('USER_NAME',USER_NAME); }
+  let res=[];
+  if(t.includes('assalamualaikum')) res=[`Waalaikumsalam ${USER_NAME||'kak'} 🙏 ${waktu}!`];
+  else if(t.includes('hello')||t.includes('hi')&&t.length<10) res=[`Hello ${USER_NAME||'there'}! 👋`, `Hi ${USER_NAME||'kak'}! Mau info apa?`];
+  else res=[`${waktu} ${USER_NAME||'kak'}! 👋 Mau info kampus atau bank?`, `Hai ${USER_NAME||'kak'}! 😊 Klik info di bawah ya`];
+  let balasan=res[Math.floor(Math.random()*res.length)];
+  return balasan + genMenuInfo();
+}
+function tambahMsg(from,html){ let div=document.createElement('div'); div.className='msg '+from; div.innerHTML=html; chatBox.appendChild(div); chatBox.scrollTop=chatBox.scrollHeight; return div; }
+function quickChat(text){ document.getElementById('pesan').value=text; kirim(); }
+async function kirim(){
+  let input=document.getElementById('pesan'); let text=input.value.trim(); if(!text) return;
+  tambahMsg('user',text); input.value='';
+  if(text.toLowerCase().includes('stie') || text.toLowerCase().includes('dharma putra')){ showInfo('STIE DP'); return; }
+  if(text.toLowerCase().includes('bpr') || text.toLowerCase().includes('cempaka')){ showInfo('BPR CEMPAKA'); return; }
+  if(text.toLowerCase()==='menu'||text.toLowerCase()==='/menu'){ tambahMsg('ai',`📋 <b>MENU</b><br>`+genMenuInfo()); return; }
+  if(text.toLowerCase()==='/reset'){ localStorage.removeItem('USER_NAME'); USER_NAME=''; tambahMsg('ai','✅ Reset!'+genMenuInfo()); return; }
+  if(cekSapaan(text)){ setTimeout(()=>{ tambahMsg('ai',balasSapaan(text)); },500); return; }
+  if(text.toLowerCase().startsWith('/gambar')||text.toLowerCase().startsWith('/stiker')){ let p=text.replace(/\/gambar|\/stiker|\/sticker/i,'').trim()||'cute cat'; buatGambar(p); return; }
+  let typing=tambahMsg('ai','<div class="typing"><span></span><span></span><span></span></div> ngetik...');
+  try{
+    let res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:`Kamu MRBLACKJACK399 AI. User: ${USER_NAME||'kak'}. Waktu: ${getTimeGreeting()}. Jawab singkat 2 kalimat. Jika tanya STIE DP/BPR, jawab suruh klik tombol info. Pertanyaan: ${text}`}]}]})});
+    let data=await res.json(); let jawab=data.candidates?.[0]?.content?.parts?.[0]?.text||"Error bang";
+    typing.innerHTML=jawab.replace(/\n/g,'<br>')+genMenuInfo();
+  }catch(e){ typing.innerHTML='⚠️ Error API Key'+genMenuInfo(); }
+}
+async function buatGambar(prompt){
+  let loading=tambahMsg('ai',`🎨 Bikin: <b>${prompt}</b>...`);
+  try{ let seed=Math.floor(Math.random()*99999); let url=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt+', sticker style') }?width=512&height=512&seed=${seed}&nologo=true`; loading.remove(); tambahMsg('ai',`<b>${prompt}</b><img id="img-${seed}" src="${url}" crossorigin="anonymous"><div class="btns"><button class="sticker" onclick="jadiStiker('img-${seed}')">🔥 Jadikan Stiker WA</button><button onclick="downloadGambar('img-${seed}')">⬇️ Download</button></div>`); }catch(e){loading.innerHTML='Gagal';}
+}
+function jadiStiker(imgId){
+  let img=document.getElementById(imgId); let canvas=document.getElementById('stickerCanvas'); let ctx=canvas.getContext('2d'); ctx.clearRect(0,0,512,512); ctx.drawImage(img,0,0,512,512);
+  canvas.toBlob((blob)=>{ let url=URL.createObjectURL(blob); tambahMsg('ai',`✅ <b>Stiker Ready!</b><br><img src="${url}" style="width:200px"><div class="btns"><button class="sticker" onclick="downloadStiker('${url}')">⬇️ Download WEBP</button></div>`); let a=document.createElement('a'); a.href=url; a.download=`stiker-${Date.now()}.webp`; a.click(); },'image/webp',0.9);
+}
+function downloadGambar(imgId){ let img=document.getElementById(imgId); let a=document.createElement('a'); a.href=img.src; a.target='_blank'; a.click(); }
+function downloadStiker(url){ let a=document.createElement('a'); a.href=url; a.download=`stiker-MRBLACKJACK399-${Date.now()}.webp`; a.click(); }
+</script>
+</body>
+</html>
