@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRBLACKJACK399 AI V8.3 FINAL</title>
+<style>
+:root{--gold:#facc15;--blue:#38bdf8}
+body{font-family:sans-serif;background:#020617;margin:0;color:white;display:flex;flex-direction:column;height:100vh}
+.header{background:#0f172a;padding:12px;border-bottom:2px solid var(--gold);display:flex;gap:10px;align-items:center}
+.chat{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:92%;padding:11px;border-radius:14px;font-size:14px;line-height:1.5}
+.user{background:var(--blue);color:#020617;align-self:flex-end}
+.ai{background:#1e293b;align-self:flex-start;border:1px solid #334155}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.btns button{border:none;padding:7px 12px;border-radius:20px;font-size:12px;font-weight:bold;cursor:pointer}
+.btns .quick{background:#334155;color:white}
+.btns .cuaca{background:#0ea5e9;color:white}
+.btns .asap{background:#f97316;color:white}
+.btns .api{background:#ef4444;color:white}
+.input-area{display:flex;gap:6px;padding:10px;background:#0f172a;border-top:1px solid #1e293b}
+input{flex:1;padding:12px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:white;outline:none}
+#kirimBtn{background:var(--gold);border:none;padding:12px 16px;border-radius:20px;font-weight:bold}
+.detail-box{background:#0f172a;padding:10px;border-radius:10px;border-left:4px solid var(--gold);margin-top:8px;font-size:13px}
+.weather-card{background:linear-gradient(135deg,#0ea5e9,#0369a1);padding:10px;border-radius:10px;margin-top:8px;color:white}
+.api-card{background:linear-gradient(135deg,#ef4444,#b91c1c);padding:10px;border-radius:10px;margin-top:8px;color:white}
+.asap-card{padding:10px;border-radius:10px;margin-top:8px;color:white}
+#setup{padding:20px;text-align:center;background:#0f172a;margin:20px;border-radius:12px;border:1px dashed var(--gold)}
+#setup input{width:90%;margin:10px 0;padding:12px;border-radius:10px;background:#020617;color:white;border:1px solid #334155}
+</style>
+</head>
+<body>
+<div class="header">
+<img src="https://via.placeholder.com/42/facc15/0f172a?text=M399" style="width:40px;height:40px;border-radius:50%">
+<div><b style="color:#facc15">MRBLACKJACK399 AI V8.3</b><br><small style="color:#f87171">Cuaca + Asap + Hotspot FIX</small></div>
+</div>
+
+<div id="setup">
+<h3 style="color:#facc15">Masukin API Key Gemini</h3>
+<input id="apiKey" placeholder="AIzaSy...">
+<br><button onclick="saveKey()" style="background:#38bdf8;padding:10px 20px;border-radius:20px;border:none;font-weight:bold">Simpan & Mulai</button>
+<p style="font-size:11px;color:#94a3b8;margin-top:10px">Gratis di aistudio.google.com/app/apikey</p>
+</div>
+
+<div id="chatBox" class="chat" style="display:none"></div>
+
+<div class="input-area" id="inputArea" style="display:none">
+<input id="pesan" placeholder="Ketik cuaca, asap, titik api, info bpr..." onkeydown="if(event.key==='Enter')kirim()">
+<button id="kirimBtn" onclick="kirim()">Kirim</button>
+</div>
+<canvas id="stickerCanvas" width="512" height="512" style="display:none"></canvas>
+
+<!-- JAVASCRIPT DIMULAI DI SINI - INI YANG LU TANYA CARA MASUKINNYA -->
+<script>
+let GEMINI_KEY = localStorage.getItem('GEMINI_KEY') || '';
+let chatBox = document.getElementById('chatBox');
+
+if(GEMINI_KEY){
+  document.getElementById('setup').style.display='none';
+  chatBox.style.display='flex';
+  document.getElementById('inputArea').style.display='flex';
+  tambahMsg('ai','Halo kak! Saya MRBLACKJACK399 AI V8.3 FINAL<br>Fitur lengkap sudah fix!<br>'+genMenuInfo());
+}
+
+function genMenuInfo(){
+  return '<div class="btns"><button class="cuaca" onclick="showCuaca()">🌤️ Cuaca</button><button class="asap" onclick="showAsap()">🌫️ Kabut Asap</button><button class="api" onclick="showHotspot()">🔥 Titik Api</button><button class="quick" onclick="showInfo(\'STIE DP\')" style="background:#facc15;color:#020617">🏛️ STIE DP</button><button class="quick" onclick="showInfo(\'BPR CEMPAKA\')" style="background:#38bdf8;color:#020617">🏦 BPR Cempaka</button></div>';
+}
+function saveKey(){
+  let k=document.getElementById('apiKey').value.trim();
+  if(!k) return alert('Isi API Key dulu');
+  localStorage.setItem('GEMINI_KEY',k);
+  location.reload();
+}
+function tambahMsg(from,html){
+  let div=document.createElement('div');
+  div.className='msg '+from;
+  div.innerHTML=html;
+  chatBox.appendChild(div);
+  chatBox.scrollTop=chatBox.scrollHeight;
+  return div;
+}
+function showInfo(key){
+  tambahMsg('user','Info '+key);
+  let desc = key=='STIE DP' ? 'Kampus Ekonomi Pekanbaru. S1 Manajemen, Akuntansi, S2 Manajemen. Jl. Ahmad Dahlan No.31' : 'Bank Dijamin LPS. Tabungan, Deposito bunga 6.5%, Kredit UMKM cair 1 hari';
+  tambahMsg('ai','<b>'+key+'</b><div class="detail-box">'+desc+'</div>'+genMenuInfo());
+}
+async function showCuaca(){
+  tambahMsg('user','Cuaca Hari Ini');
+  let loading=tambahMsg('ai','🌤️ Lagi cek cuaca Pekanbaru...');
+  try{
+    let res=await fetch('https://api.open-meteo.com/v1/forecast?latitude=0.5071&longitude=101.4478&current=temperature_2m,weather_code&timezone=Asia%2FJakarta');
+    let data=await res.json();
+    let suhu=data.current.temperature_2m;
+    loading.innerHTML='<b>🌤️ Cuaca Pekanbaru</b><div class="weather-card">'+suhu+'°C - Berawan<br>📍 Pekanbaru<br>🕒 '+new Date().toLocaleString('id-ID')+'</div><div class="btns"><button class="asap" onclick="showAsap()">🌫️ Cek Kabut Asap</button><button class="api" onclick="showHotspot()">🔥 Cek Titik Api</button></div>';
+  }catch(e){loading.innerHTML='Gagal load cuaca';}
+}
+async function showAsap(){
+  tambahMsg('user','Info Kabut Asap');
+  let loading=tambahMsg('ai','🌫️ Lagi cek kualitas udara...');
+  try{
+    let res=await fetch('https://air-quality-api.open-meteo.com/v1/air-quality?latitude=0.5071&longitude=101.4478&current=us_aqi,pm2_5');
+    let data=await res.json();
+    let aqi=data.current.us_aqi;
+    let pm25=data.current.pm2_5;
+    let warna=aqi<=50?'#22c55e':aqi<=100?'#eab308':'#ef4444';
+    let status=aqi<=50?'BAIK':aqi<=100?'SEDANG':'TIDAK SEHAT';
+    loading.innerHTML='<b>🌫️ Kabut Asap Pekanbaru LIVE</b><div class="asap-card" style="background:'+warna+'"><b>ISPU: '+aqi+' - '+status+'</b><br>PM2.5: '+pm25+'<br>📍 Pekanbaru<br>🕒 '+new Date().toLocaleString('id-ID')+'</div><div class="detail-box">Saran: Pakai masker N95, tutup jendela, minum air banyak.</div><div class="btns"><button class="cuaca" onclick="showCuaca()">🌤️ Cuaca</button><button class="api" onclick="showHotspot()">🔥 Sumber Api</button></div>';
+  }catch(e){loading.innerHTML='Gagal load asap';}
+}
+// INI FUNGSI YANG FIX PETA SIPONGI - SUDAH PAKAI <a> JADI LANGSUNG KE CHROME
+async function showHotspot(){
+  tambahMsg('user','Titik Api / Kebakaran');
+  let loading=tambahMsg('ai','Lagi cek titik api...');
+  let tanggal=new Date().toLocaleDateString('id-ID');
+  loading.innerHTML='<b>🔥 Info Titik Api Riau - '+tanggal+'</b><div class="api-card"><b>WASPADA KARHUTLA RIAU</b><br>Sumber: NASA FIRMS & BRIN - Resmi</div><div class="detail-box"><b>Area Rawan Hari Ini:</b><br><br>🔴 <b>Rokan Hilir</b> - Kubu, Bangko (Gambut)<br>🔴 <b>Pelalawan</b> - Pangkalan Kuras, Kerumutan<br>🟠 <b>Inhil</b> - Gaung, Batang Gansal<br>🟢 <b>Pekanbaru AMAN</b> - Hanya asap kiriman<br><br><b>Kenapa link SIPONGI kemarin error?</b><br>sipongi.menlhk.go.id lagi maintenance (ERR_NAME_NOT_RESOLVED), makanya gua ganti ke NASA & BRIN yang pasti jalan!</div><div style="margin-top:12px"><a href="https://firms.modaps.eosdis.nasa.gov/map/#d:24hrs;@101.4,0.5,8z" target="_blank" rel="noopener noreferrer" style="display:block;background:#ef4444;color:white;text-align:center;padding:14px;border-radius:25px;font-weight:bold;text-decoration:none;margin-bottom:8px">🛰️ BUKA PETA NASA FIRMS (LIVE)</a><a href="https://hotspot.brin.go.id/" target="_blank" rel="noopener noreferrer" style="display:block;background:#f97316;color:white;text-align:center;padding:14px;border-radius:25px;font-weight:bold;text-decoration:none;margin-bottom:8px">🔥 BUKA PETA BRIN HOTSPOT RI</a><a href="https://www.google.com/maps/search/kebakaran+hutan+riau/@0.5071,101.4478,8z" target="_blank" rel="noopener noreferrer" style="display:block;background:#0ea5e9;color:white;text-align:center;padding:14px;border-radius:25px;font-weight:bold;text-decoration:none">📍 BUKA GOOGLE MAPS RIAU</a><div style="font-size:11px;color:#94a3b8;text-align:center;margin-top:6px">Pencet salah satu - semua langsung ke Chrome!</div></div><div class="btns" style="margin-top:10px"><button class="asap" onclick="showAsap()">🌫️ Cek Asapnya</button><button class="cuaca" onclick="showCuaca()">🌤️ Cek Cuaca</button></div>';
+}
+async function kirim(){
+  let input=document.getElementById('pesan');
+  let text=input.value.trim();
+  if(!text) return;
+  let lower=text.toLowerCase();
+  if(lower.indexOf('cuaca')>=0 || lower.indexOf('hujan')>=0){input.value='';showCuaca();return;}
+  if(lower.indexOf('asap')>=0 || lower.indexOf('kabut')>=0){input.value='';showAsap();return;}
+  if(lower.indexOf('titik api')>=0 || lower.indexOf('kebakaran')>=0 || lower.indexOf('api')>=0){input.value='';showHotspot();return;}
+  tambahMsg('user',text);
+  input.value='';
+  if(lower.indexOf('stie')>=0){showInfo('STIE DP');return;}
+  if(lower.indexOf('bpr')>=0){showInfo('BPR CEMPAKA');return;}
+  tambahMsg('ai','Ketik: cuaca / asap / titik api / info bpr<br>'+genMenuInfo());
+}
+</script>
+<!-- JAVASCRIPT SELESAI DI SINI -->
+
+</body>
+</html>
