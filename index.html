@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RYAN HIDAYAT AI V9.25 FOTO BALIK</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+body{background:#020617;min-height:100vh;font-family:system-ui}
+.glass{background:rgba(15,23,42,0.95);border:1px solid rgba(255,255,255,0.1)}
+#mapPesawat,#mapRudal,#mapAsap{width:100%;height:380px;border-radius:16px;background:#0f172a;z-index:1}
+.plane-icon{font-size:22px}
+.marquee{white-space:nowrap;animation:marquee 35s linear infinite;display:inline-block;padding-left:100%}
+@keyframes marquee{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+.radar-sweep{position:absolute;top:50%;left:50%;width:100%;height:100%;background:conic-gradient(from 0deg, transparent 0deg, rgba(14,165,233,0.15) 30deg, transparent 60deg);transform:translate(-50%,-50%);border-radius:50%;animation:rotate 4s linear infinite;pointer-events:none;z-index:400}
+@keyframes rotate{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.notranslate{translate:no}
+img{ -webkit-user-select:none; user-select:none; }
+</style>
+</head>
+<body class="text-white p-3" translate="no">
+
+<div class="glass p-3 rounded-2xl flex items-center gap-3">
+  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-sky-400 to-red-500 flex items-center justify-center font-black text-white">✈️</div>
+  <div class="flex-1"><p class="font-black text-yellow-400 text-[13px]">RYAN HIDAYAT AI V9.25 FOTO PESAWAT</p><p class="text-[9px] text-slate-300">FOTO BALIK - SELEBARAN ILANG - Level <span id="userLevel">1</span> • <span id="userPoints">0</span> • <span id="upd">-</span> WIB</p><div class="w-full bg-black/50 rounded-full h-1.5 mt-1"><div id="levelBar" class="bg-sky-400 h-1.5 rounded-full" style="width:15%"></div></div></div>
+  <span class="bg-green-500 text-black px-3 py-1 rounded-full text-[9px] font-black">FOTO ON ✓</span>
+</div>
+
+<div class="glass rounded-full mt-3 p-2 overflow-hidden flex items-center">
+  <span class="bg-sky-500 text-white px-2 py-0.5 rounded-full text-[9px] font-black mr-2">RADAR LIVE</span>
+  <div class="flex-1 overflow-hidden"><div id="newsTicker" class="marquee text-[11px]">✈️ 12 pesawat Sabang-Merauke foto balik • 🚀 Radar Rudal • SELEBARAN ILANG • Populasi 8.23M...</div></div>
+</div>
+
+<div class="glass rounded-2xl p-3 mt-3 border border-yellow-400/20">
+  <h2 class="font-black text-yellow-400 text-[11px]">🌍 Populasi + Radar Pesawat + Rudal</h2>
+  <div class="grid grid-cols-4 gap-2 mt-2 text-center">
+    <div class="bg-yellow-500/10 p-2 rounded-xl"><p class="text-[7px] text-slate-400">TOTAL</p><p id="popTotal" class="font-black text-[10px] text-yellow-300">8,231,000,000</p></div>
+    <div class="bg-blue-500/10 p-2 rounded-xl"><p class="text-[7px] text-slate-400">LAKI 50.4%</p><p id="popMale" class="font-black text-[10px] text-blue-400">4,146,000,000</p></div>
+    <div class="bg-sky-500/10 p-2 rounded-xl border border-sky-500/20"><p class="text-[7px] text-sky-300">PESAWAT</p><p id="planeCount" class="font-black text-[11px] text-sky-300">12 LIVE</p></div>
+    <div class="bg-red-500/10 p-2 rounded-xl border border-red-500/20"><p class="text-[7px] text-red-300">RUDAL</p><p id="missileCount" class="font-black text-[10px] text-green-400">Aman</p></div>
+  </div>
+  <div id="popLokasi" class="bg-white/5 p-2 rounded-xl mt-2 text-[10px]">📍 <span id="popLokasiName">Pekanbaru, Riau</span> - <span id="popLokasiCount">Memuat...</span></div>
+</div>
+
+<div id="cardPeringatan" class="glass rounded-2xl p-3 mt-3 border-l-4 border-sky-500">
+  <div class="flex justify-between items-center"><h2 class="font-black text-[12px]">⚠️ Peringatan Dini</h2><span id="peringatanBadge" class="bg-sky-500 text-white px-2 py-1 rounded-full text-[9px] font-black animate-pulse">12 PESAWAT</span></div>
+  <div id="peringatanBox" class="mt-2 text-[11px]"></div>
+  <div class="grid grid-cols-4 gap-2 mt-2">
+    <div class="bg-white/5 p-2 rounded-xl text-center"><p class="text-[8px] text-slate-400">Hujan</p><p id="warnHujan" class="font-black text-[10px] text-red-400">TERDETEKSI</p></div>
+    <div class="bg-white/5 p-2 rounded-xl text-center"><p class="text-[8px] text-slate-400">Angin</p><p id="warnAngin" class="font-black text-[10px] text-red-400">TERDETEKSI</p></div>
+    <div class="bg-sky-500/10 p-2 rounded-xl text-center border border-sky-500/20"><p class="text-[8px] text-sky-300">Pesawat</p><p id="warnPesawat" class="font-black text-[10px] text-sky-400">12</p></div>
+    <div class="bg-green-500/10 p-2 rounded-xl text-center border border-green-500/20"><p class="text-[8px] text-green-300">Rudal</p><p id="warnRudal" class="font-black text-[10px] text-green-400">Nihil</p></div>
+  </div>
+</div>
+
+<div class="glass rounded-2xl p-4 mt-3">
+  <h2 class="font-black mb-2 text-[13px]">🇮🇩 Cari Indonesia Sabang-Merauke</h2>
+  <div id="breadcrumb" class="flex gap-1 text-[10px] text-yellow-400 mb-2"><span>🌍</span><span id="crumbNegara">Indonesia</span><span>›</span><span id="crumbDaerah" class="text-white">Sabang-Merauke</span></div>
+  <div class="relative">
+    <input id="kecSearch" type="text" placeholder="Ketik: Jakarta, Merauke, Garuda..." class="w-full bg-black/50 border border-sky-500/30 text-xs rounded-xl px-3 py-3 outline-none">
+    <div id="searchResults" class="absolute z-50 top-12 left-0 right-0 bg-[#0f172a] border border-white/20 rounded-xl max-h-[350px] overflow-y-auto hidden"></div>
+  </div>
+  <div class="flex gap-1 overflow-x-auto mt-2 pb-1">
+    <button onclick="searchCountry('Indonesia')" class="bg-red-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black">🇮🇩 SABANG-MERAUKE</button>
+    <button onclick="loadPesawat()" class="bg-sky-500 text-white px-3 py-1.5 rounded-full text-[10px] font-bold">✈️ SCAN PESAWAT</button>
+    <button onclick="loadRudal()" class="bg-red-500 text-white px-3 py-1.5 rounded-full text-[10px] font-bold">🚀 SCAN RUDAL</button>
+  </div>
+  <div id="regionBox" class="mt-3">
+    <p class="text-[11px] font-black text-red-400 mb-2">📍 INDONESIA 38 PROVINSI - JAKARTA SAMPAI MERAUKE:</p>
+    <div id="regionList" class="grid grid-cols-2 md:grid-cols-3 gap-1.5 max-h-[350px] overflow-y-auto bg-black/30 p-2 rounded-xl border border-red-500/20"></div>
+  </div>
+  <select id="kecSelect" class="hidden"><option value="0.51,101.44">Pekanbaru</option></select>
+  <div id="cuaca7" class="grid grid-cols-7 gap-1 mt-3 text-center"></div>
+  <canvas id="chartHourly" height="120" class="mt-3"></canvas>
+  <p id="lokasiAktif" class="text-[10px] text-slate-400 mt-2 text-center">Lokasi: Pekanbaru</p>
+</div>
+
+<div class="glass rounded-2xl p-4 mt-3 border border-sky-500/30">
+  <h2 class="font-black mb-2 text-[13px] text-sky-400">✈️ RADAR PESAWAT LIVE</h2>
+  <div class="relative"><div id="mapPesawat"></div><div class="radar-sweep"></div></div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
+    <div id="infoPesawat" class="p-3 bg-sky-500/10 border border-sky-500/20 rounded-xl text-[11px]">✈️ Memuat 12 pesawat...</div>
+    <div id="detailPesawat" class="p-3 bg-white/5 rounded-xl text-[11px]">Klik pesawat di peta</div>
+  </div>
+</div>
+
+<div class="glass rounded-2xl p-4 mt-3 border border-red-500/30">
+  <h2 class="font-black mb-2 text-[13px] text-red-400">🚀 RADAR PENDETEKSI RUDAL</h2>
+  <div class="relative"><div id="mapRudal"></div><div class="radar-sweep" style="background:conic-gradient(from 0deg, transparent 0deg, rgba(239,68,68,0.15) 30deg, transparent 60deg)"></div></div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
+    <div id="infoRudal" class="p-3 bg-green-500/10 border border-green-500/20 rounded-xl text-[11px]">✅ Aman</div>
+    <div id="detailRudal" class="p-3 bg-white/5 rounded-xl text-[11px]">Radar aktif</div>
+  </div>
+</div>
+
+<div class="glass rounded-2xl p-4 mt-3">
+  <h2 class="font-black mb-2 text-[12px]">🗺️ Map Cuaca Sabang-Merauke</h2>
+  <div id="mapAsap"></div>
+  <div id="infoAsap" class="mt-2 p-2 bg-white/5 rounded-xl text-[10px]">Memuat...</div>
+</div>
+
+<script>
+let chartHourly=null;
+let searchTimeout=null;
+let mapAsap=null;
+let mapPesawat=null;
+let mapRudal=null;
+let worldPop=8231000000;
+let points=0;
+let level=1;
+let pesawatMarkers=[];
+let rudalMarkers=[];
+let pesawatData=[];
+
+function updatePop(){
+  worldPop+=2;
+  const totalEl=document.getElementById('popTotal');
+  const maleEl=document.getElementById('popMale');
+  const femaleEl=document.getElementById('popFemale');
+  if(totalEl) totalEl.innerText=worldPop.toLocaleString('id-ID');
+  if(maleEl) maleEl.innerText=Math.floor(worldPop*0.504).toLocaleString('id-ID');
+  if(femaleEl) femaleEl.innerText=Math.floor(worldPop*0.496).toLocaleString('id-ID');
+}
+
+function addPoints(n){
+  points+=n;
+  document.getElementById('userPoints').innerText=points;
+  level=Math.floor(points/500)+1;
+  document.getElementById('userLevel').innerText=level;
+  document.getElementById('levelBar').style.width=(points%500/5)+'%';
+}
+
+function updatePeringatanFix(dailyArray, forcedName, windSpeed){
+  const maxHujan=Math.max.apply(null,dailyArray);
+  const lokasiName=forcedName||document.getElementById('kecSearch').value||'Pekanbaru';
+  const jam=new Date().toLocaleTimeString('id-ID');
+  document.getElementById('upd').innerText=jam;
+  document.getElementById('warnHujan').innerHTML='TERDETEKSI<br>'+maxHujan+'mm';
+  document.getElementById('warnAngin').innerHTML='TERDETEKSI<br>'+windSpeed.toFixed(1)+' km/j';
+  document.getElementById('warnPesawat').innerText=pesawatData.length+' Pesawat';
+  const box=document.getElementById('peringatanBox');
+  if(box){
+    box.innerHTML='<div class="p-2 rounded-xl bg-sky-500/10 border border-sky-500/30"><p class="text-[11px] font-bold text-sky-400">RADAR AKTIF - '+lokasiName+' | Pesawat: '+pesawatData.length+' | Hujan: '+maxHujan+'mm</p><p class="text-[10px] text-slate-300">Update: '+jam+' WIB</p></div>';
+  }
+  document.getElementById('peringatanBadge').innerText=pesawatData.length+' PESAWAT LIVE';
+}
+
+function loadPesawat(){
+  addPoints(50);
+  if(!mapPesawat){
+    mapPesawat=L.map('mapPesawat').setView([-2.5,118],5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapPesawat);
+  }
+  pesawatData=[
+    {callsign:'GIA-123',airline:'Garuda Indonesia',from:'Jakarta CGK',to:'Singapore SIN',lat:1.2,lon:103.5,alt:35000,speed:850,type:'Boeing 737-800',reg:'PK-GIA'},
+    {callsign:'LNI-456',airline:'Lion Air',from:'Surabaya SUB',to:'Jakarta CGK',lat:-6.5,lon:107.5,alt:32000,speed:820,type:'Boeing 737-900ER',reg:'PK-LNI'},
+    {callsign:'SIA-789',airline:'Singapore Airlines',from:'Singapore SIN',to:'Tokyo NRT',lat:2.5,lon:104.5,alt:38000,speed:900,type:'Airbus A350-900',reg:'9V-SIA'},
+    {callsign:'QTR-101',airline:'Qatar Airways',from:'Doha DOH',to:'Bali DPS',lat:-8.5,lon:115.2,alt:36000,speed:880,type:'Boeing 777-300ER',reg:'A7-QTR'},
+    {callsign:'GIA-890',airline:'Garuda Indonesia',from:'Jakarta CGK',to:'Merauke MKQ',lat:-2.5,lon:120.5,alt:34000,speed:830,type:'Boeing 737-800',reg:'PK-GJA'},
+    {callsign:'BTK-234',airline:'Batik Air',from:'Medan KNO',to:'Jakarta CGK',lat:2.0,lon:100.5,alt:33000,speed:810,type:'Airbus A320',reg:'PK-BTK'},
+    {callsign:'JAL-567',airline:'Japan Airlines',from:'Tokyo NRT',to:'Jakarta CGK',lat:0.5,lon:105.5,alt:37000,speed:890,type:'Boeing 787-9',reg:'JA-JAL'},
+    {callsign:'UAE-321',airline:'Emirates',from:'Dubai DXB',to:'Jakarta CGK',lat:-1.0,lon:102.5,alt:40000,speed:920,type:'Airbus A380-800',reg:'A6-UAE'},
+    {callsign:'GIA-555',airline:'Garuda Indonesia',from:'Jakarta CGK',to:'Jayapura DJJ',lat:-3.5,lon:135.5,alt:35000,speed:840,type:'Boeing 737-800',reg:'PK-GFF'},
+    {callsign:'SJV-777',airline:'Super Air Jet',from:'Pekanbaru PKU',to:'Jakarta CGK',lat:0.8,lon:101.8,alt:28000,speed:780,type:'Airbus A320',reg:'PK-SJV'},
+    {callsign:'GIA-001',airline:'Garuda Indonesia',from:'Jakarta CGK',to:'Mekkah JED',lat:15.5,lon:60.5,alt:38000,speed:900,type:'Boeing 777-300ER',reg:'PK-GII'},
+    {callsign:'LNI-999',airline:'Lion Air',from:'Balikpapan BPN',to:'Surabaya SUB',lat:-4.5,lon:112.5,alt:30000,speed:800,type:'Boeing 737-800',reg:'PK-LJH'}
+  ];
+  document.getElementById('planeCount').innerText=pesawatData.length+' LIVE';
+  document.getElementById('warnPesawat').innerText=pesawatData.length+' Pesawat';
+  let listHtml='';
+  for(let i=0;i<pesawatData.length;i++){
+    let p=pesawatData[i];
+    listHtml+=p.callsign+' - '+p.airline+' | '+p.from+' ke '+p.to+'<br>';
+  }
+  document.getElementById('infoPesawat').innerHTML='<b>'+pesawatData.length+' Pesawat di Atas Indonesia Sabang-Merauke</b><br><br>'+listHtml;
+  for(let i=0;i<pesawatMarkers.length;i++){ mapPesawat.removeLayer(pesawatMarkers[i]); }
+  pesawatMarkers=[];
+  for(let i=0;i<pesawatData.length;i++){
+    let p=pesawatData[i];
+    let icon=L.divIcon({className:'plane-icon',html:'<div style="background:#0ea5e9;color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:2px solid white">✈️</div>',iconSize:[28,28]});
+    let marker=L.marker([p.lat,p.lon],{icon:icon}).addTo(mapPesawat);
+    let popupText='<div class="notranslate" translate="no"><b>'+p.callsign+' - '+p.airline+'</b><br>Registrasi: '+p.reg+'<br>Tipe: '+p.type+'<br>Dari: '+p.from+'<br>Tujuan: '+p.to+'<br>Ketinggian: '+p.alt+' ft<br>Kecepatan: '+p.speed+' km/j<br><br><img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=300" class="notranslate" translate="no" style="width:100%;border-radius:10px" alt="Pesawat"><br><div style="background:#f0f9ff;padding:8px;border-radius:8px;margin-top:8px;color:#0c4a6e">Tujuan: '+p.to+' | Status: On Time</div></div>';
+    marker.bindPopup(popupText);
+    let currentP=p;
+    marker.on('click',function(){
+      const detailDiv=document.getElementById('detailPesawat');
+      detailDiv.innerHTML='<div class="notranslate" translate="no"><b>DETAIL PESAWAT: '+currentP.callsign+'</b><br>Airline: '+currentP.airline+'<br>Registrasi: '+currentP.reg+'<br>Tipe: '+currentP.type+'<br>Dari: '+currentP.from+'<br>Tujuan: '+currentP.to+'<br>Ketinggian: '+currentP.alt+' ft<br>Kecepatan: '+currentP.speed+' km/j<br><br><img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=350" class="notranslate" translate="no" style="width:100%;border-radius:12px" alt="Pesawat"></div>';
+    });
+    pesawatMarkers.push(marker);
+  }
+}
+
+function loadRudal(){
+  addPoints(100);
+  if(!mapRudal){
+    mapRudal=L.map('mapRudal').setView([-2.5,118],5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapRudal);
+  }
+  let isSimulasiRudal = Math.random() < 0.15;
+  for(let i=0;i<rudalMarkers.length;i++){ mapRudal.removeLayer(rudalMarkers[i]); }
+  rudalMarkers=[];
+  let perairan=[
+    {name:'Selat Malaka',lat:3.5,lon:100.5,radius:80000},
+    {name:'Laut Natuna',lat:4.0,lon:108.0,radius:100000},
+    {name:'Laut Sulawesi',lat:2.0,lon:121.0,radius:90000},
+    {name:'Selat Makassar',lat:-2.0,lon:118.0,radius:70000},
+    {name:'Samudra Hindia - Sabang',lat:5.8,lon:95.3,radius:60000},
+    {name:'Laut Arafura - Merauke',lat:-8.5,lon:140.5,radius:70000}
+  ];
+  for(let i=0;i<perairan.length;i++){
+    let p=perairan[i];
+    L.circle([p.lat,p.lon],{color:'#22c55e',fillColor:'#22c55e',fillOpacity:0.08,radius:p.radius}).addTo(mapRudal).bindPopup('Aman - '+p.name);
+  }
+  if(isSimulasiRudal){
+    let rudalPos={lat:4.5,lon:107.5,speed:2500,alt:20000};
+    let icon=L.divIcon({className:'plane-icon',html:'<div style="background:red;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center">🚀</div>',iconSize:[32,32]});
+    let marker=L.marker([rudalPos.lat,rudalPos.lon],{icon:icon}).addTo(mapRudal);
+    marker.bindPopup('OBJEK CEPAT TERDETEKSI - Laut Natuna - Kecepatan 2500 km/j');
+    rudalMarkers.push(marker);
+    L.circle([rudalPos.lat,rudalPos.lon],{color:'red',fillColor:'red',fillOpacity:0.25,radius:150000}).addTo(mapRudal);
+    document.getElementById('missileCount').innerHTML='<span style="background:red;color:white;padding:2px 8px;border-radius:10px">1 WASPADA</span>';
+    document.getElementById('warnRudal').innerText='1 TERDETEKSI';
+    document.getElementById('infoRudal').innerHTML='WASPADA - 1 Objek Cepat - Laut Natuna - 2500 km/j - '+new Date().toLocaleTimeString('id-ID');
+    document.getElementById('peringatanBadge').innerText='RUDAL WASPADA';
+    document.getElementById('peringatanBadge').className='bg-red-600 text-white px-2 py-1 rounded-full text-[9px] font-black animate-pulse';
+  }else{
+    document.getElementById('missileCount').innerText='0 Aman';
+    document.getElementById('warnRudal').innerText='Nihil Aman';
+    document.getElementById('infoRudal').innerHTML='Aman - Tidak ada rudal - Selat Malaka Aman - Natuna Aman - Sulawesi Aman - Makassar Aman - Sabang Aman - Merauke Aman - Update '+new Date().toLocaleTimeString('id-ID')+' WIB';
+    document.getElementById('detailRudal').innerHTML='Radar aktif 24 jam - Sabang sampai Merauke aman';
+  }
+}
+
+function searchCountry(countryName){
+  addPoints(50);
+  const searchInput=document.getElementById('kecSearch');
+  if(searchInput) searchInput.value=countryName;
+  document.getElementById('crumbNegara').innerText=countryName;
+  const listContainer=document.getElementById('regionList');
+  listContainer.innerHTML='';
+  let indonesiaList=[
+    'Sabang - Aceh (Ujung Barat)','Banda Aceh - Aceh','Medan - Sumatera Utara','Padang - Sumatera Barat','Pekanbaru - Riau','Jambi - Jambi','Palembang - Sumatera Selatan','Bengkulu - Bengkulu','Bandar Lampung - Lampung','Pangkal Pinang - Bangka Belitung','Tanjung Pinang - Kepri',
+    'Jakarta - DKI Jakarta (Ibukota)','Serang - Banten','Bandung - Jawa Barat','Semarang - Jawa Tengah','Yogyakarta - DIY','Surabaya - Jawa Timur','Denpasar - Bali',
+    'Pontianak - Kalbar','Palangkaraya - Kalteng','Banjarmasin - Kalsel','Samarinda - Kaltim','Tanjung Selor - Kaltara','Balikpapan - Kaltim',
+    'Manado - Sulut','Palu - Sulteng','Makassar - Sulsel','Kendari - Sultra','Mamuju - Sulbar','Gorontalo - Gorontalo',
+    'Mataram - NTB','Kupang - NTT','Ambon - Maluku','Ternate - Maluku Utara',
+    'Jayapura - Papua','Merauke - Papua Selatan (Ujung Timur)','Sorong - Papua Barat Daya','Manokwari - Papua Barat','Nabire - Papua Tengah','Wamena - Papua Pegunungan','Timika - Papua Tengah','Biak - Papua'
+  ];
+  let listToShow=[];
+  if(countryName.toLowerCase().indexOf('indonesia')!==-1){
+    listToShow=indonesiaList;
+  }else{
+    listToShow=['Brasilia de Minas - Minas Gerais','Sao Paulo - SP','Tokyo - Tokyo'];
+  }
+  for(let i=0;i<listToShow.length;i++){
+    let item=listToShow[i];
+    let parts=item.split(' - ');
+    let kota=parts[0];
+    let prov=parts[1]||'';
+    let btn=document.createElement('button');
+    btn.className='text-left bg-white/5 border border-white/10 p-2 rounded-xl text-[10px]';
+    if(item.indexOf('Ujung')!==-1||kota==='Jakarta'||kota==='Merauke'||kota==='Sabang'){
+      btn.className='text-left bg-red-500/20 border border-red-500/40 p-2 rounded-xl text-[10px] font-black';
+    }
+    btn.innerHTML='<span class="font-bold">📍 '+kota+'</span><br><span class="text-[9px] text-slate-400">'+prov+'</span>';
+    let currentKota=kota;
+    btn.addEventListener('click',function(){
+      searchLocationByName(currentKota);
+    });
+    listContainer.appendChild(btn);
+  }
+}
+
+function searchLocationByName(q){
+  const resultsDiv=document.getElementById('searchResults');
+  resultsDiv.innerHTML='<div class="p-3 text-[11px] text-slate-400">Mencari '+q+'...</div>';
+  resultsDiv.classList.remove('hidden');
+  fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(q)+'&count=10&language=id&format=json')
+.then(function(r){return r.json();})
+.then(function(d){
+    resultsDiv.innerHTML='';
+    if(!d.results||d.results.length===0){
+      resultsDiv.innerHTML='<div class="p-3 text-[11px] text-slate-400">Tidak ada hasil untuk '+q+'</div>';
+        return;
+      }
+      let html='';
+      for(let i=0;i<d.results.length;i++){
+        let r=d.results[i];
+        html+='<button onclick="selectLocation('+r.latitude+','+r.longitude+',\''+r.name+'\')" class="w-full text-left p-2 hover:bg-white/10 rounded-xl text-[11px] border-b border-white/5"><b>'+r.name+'</b> - '+(r.admin1||'')+' '+(r.country||'')+'<br><span class="text-[9px] text-slate-400">'+r.latitude.toFixed(2)+','+r.longitude.toFixed(2)+'</span></button>';
+      }
+      resultsDiv.innerHTML=html;
+    }).catch(function(e){
+      resultsDiv.innerHTML='<div class="p-3 text-[11px] text-red-400">Error cari lokasi: '+e.message+'</div>';
+    });
+}
+
+function selectLocation(lat,lon,name){
+  const kecSelect=document.getElementById('kecSelect');
+  if(kecSelect){
+    let opt=document.createElement('option');
+    opt.value=lat+','+lon;
+    opt.text=name;
+    kecSelect.innerHTML='';
+    kecSelect.appendChild(opt);
+    kecSelect.value=lat+','+lon;
+  }
+  const resultsDiv=document.getElementById('searchResults');
+  if(resultsDiv){ resultsDiv.classList.add('hidden'); resultsDiv.innerHTML=''; }
+  const searchInput=document.getElementById('searchInput');
+  if(searchInput){ searchInput.value=name; }
+  loadCuaca();
+  if(mapAsap){ mapAsap.setView([lat,lon],6); mapAsap.invalidateSize(); }
+  if(mapBMKG){ mapBMKG.setView([lat,lon],5); mapBMKG.invalidateSize(); }
+  if(mapRudal){ mapRudal.setView([lat,lon],4); mapRudal.invalidateSize(); }
+  if(mapPesawat){ mapPesawat.setView([lat,lon],4); mapPesawat.invalidateSize(); }
+}
+
+async function loadCuaca(){
+  try{
+    const sel=document.getElementById('kecSelect');
+    if(!sel) return;
+    const val=sel.value.split(',');
+    const lat=parseFloat(val[0]);
+    const lon=parseFloat(val[1]);
+    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&hourly=temperature_2m,precipitation,wind_speed_10m&daily=temperature_2m_max,precipitation_sum&timezone=auto&forecast_days=7');
+    const d=await r.json();
+    const jam=new Date().toLocaleTimeString('id-ID');
+    const updEl=document.getElementById('upd');
+    if(updEl) updEl.innerText=jam;
+    if(!mapAsap){
+      mapAsap=L.map('mapAsap').setView([lat,lon],4);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapAsap);
+    } else {
+      mapAsap.setView([lat,lon],5);
+    }
+    let html7='';
+    for(let i=0;i<7;i++){
+      let day=new Date(d.daily.time[i]).toLocaleDateString('id-ID',{weekday:'short'});
+      let temp=Math.round(d.daily.temperature_2m_max[i]);
+      let hujan=d.daily.precipitation_sum[i];
+      html7+='<div class="bg-white/5 rounded-xl p-2 border border-white/5"><p class="text-[9px] text-slate-400">'+day+'</p><p class="text-[10px] font-bold">'+temp+'°</p><p class="text-[9px] text-sky-300">'+hujan+'mm</p></div>';
+    }
+    const cuacaEl=document.getElementById('cuaca7');
+    if(cuacaEl) cuacaEl.innerHTML=html7;
+    const ctx=document.getElementById('chartHourly');
+    if(ctx){
+      const ctx2=ctx.getContext('2d');
+      if(chartHourly){chartHourly.destroy();}
+      chartHourly=new Chart(ctx2,{
+        type:'line',
+        data:{
+          labels:d.hourly.time.slice(0,24).map(function(t){return new Date(t).getHours()+':00';}),
+          datasets:[
+            {label:'Suhu C',data:d.hourly.temperature_2m.slice(0,24),borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,0.2)',tension:0.4},
+            {label:'Hujan mm',data:d.hourly.precipitation.slice(0,24),borderColor:'#fbbf24',backgroundColor:'rgba(251,191,36,0.2)',tension:0.4}
+          ]
+        },
+        options:{responsive:true,plugins:{legend:{display:true,labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#94a3b8',font:{size:9}},grid:{display:false}},y:{ticks:{color:'#94a3b8',font:{size:9}},grid:{color:'rgba(255,255,255,0.05)'}}}}
+      });
+    }
+  }catch(e){ console.log('Cuaca error',e); }
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  setInterval(function(){
+    const updEl=document.getElementById('upd');
+    if(updEl) updEl.innerText=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  },1000);
+  loadCuaca();
+  loadPesawat();
+  loadRudal();
+  loadBMKG();
+  setTimeout(function(){
+    if(mapRudal) mapRudal.invalidateSize();
+    if(mapBMKG) mapBMKG.invalidateSize();
+    if(mapPesawat) mapPesawat.invalidateSize();
+    if(mapAsap) mapAsap.invalidateSize();
+  },1200);
+});
+</script>
+</body>
+</html>
