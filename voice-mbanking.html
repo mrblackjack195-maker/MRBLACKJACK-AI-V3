@@ -1,1 +1,21 @@
-<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MRBLACK FINAL</title><style>body{background:#080808;color:#fff;font-family:sans-serif;text-align:center;padding:20px}h1{color:#0f8}.mic{width:120px;height:120px;background:linear-gradient(135deg,#0f8,#0af);border-radius:50%;margin:20px auto;display:flex;align-items:center;justify-content:center;font-size:60px;box-shadow:0 0 30px #0f8}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}.card{background:#151515;border:1px solid #333;border-radius:16px;padding:16px}.card.rio{background:#2a2400;border:2px solid #fc0;grid-column:span 2}#log{color:#0f8;margin:15px 0;font-weight:bold}</style></head><body><h1>MRBLACKJACK V3 FINAL</h1><div class="mic" onclick="startVoice()">🎤</div><div id="log">Tap RIO RISE langsung buka!</div><div class="grid"><div class="card rio" onclick="openApp('com.roleplay.riorise')"><b style="color:#fc0">🔥 RIO RISE v4.16.1 🔥</b><br><small>com.roleplay.riorise</small></div><div class="card" onclick="openApp('com.bca.mbanking')"><b>BCA</b></div><div class="card" onclick="openApp('com.bmri.livin')"><b>Mandiri</b></div><div class="card" onclick="openApp('com.bri.brimo')"><b>BRI</b></div><div class="card" onclick="openApp('com.bni.wondr')"><b>BNI wondr</b></div></div><script>function openApp(pkg){document.getElementById('log').innerText='Membuka '+pkg;location.href='intent://#Intent;package='+pkg+';action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end'}function startVoice(){var R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R)return alert('Pakai Chrome');var r=new R();r.lang='id-ID';r.onresult=function(e){var t=e.results[0][0].transcript.toLowerCase();if(t.includes('rio'))openApp('com.roleplay.riorise');else if(t.includes('bca'))openApp('com.bca.mbanking');else if(t.includes('bri'))openApp('com.bri.brimo');else if(t.includes('mandiri'))openApp('com.bmri.livin')};r.start()}</script></body></html>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MRBLACK V3 ULTRA FIX</title><style>body{background:#000;color:#fff;font-family:sans-serif;text-align:center;padding:15px}h1{color:#00ff88;margin:10px}.mic{width:110px;height:110px;background:radial-gradient(#00ff88,#0088ff);border-radius:50%;margin:15px auto;display:flex;align-items:center;justify-content:center;font-size:60px}.card{background:#111;border:1px solid #333;border-radius:14px;padding:15px;margin:8px;cursor:pointer}.card.rio{border:2px solid #ffcc00;background:#221e00}.card.rio b{color:#ffcc00}#log{color:#00ff88;margin:12px;font-weight:bold}</style></head><body><h1>MRBLACKJACK V3<br>ULTRA FIX</h1><div class="mic" onclick="testRio()">🎤</div><div id="log">Tap RIO RISE - Tanpa Play Store!</div><div class="card rio" onclick="launchRio()"><b>🔥 RIO RISE v4.16.1 🔥</b><br>com.roleplay.riorise<br><small>TAP INI LANGSUNG GAME!</small></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="card" onclick="launch('com.bca.mbanking')"><b>BCA</b></div><div class="card" onclick="launch('com.bmri.livin')"><b>Mandiri</b></div><div class="card" onclick="launch('com.bri.brimo')"><b>BRI</b></div><div class="card" onclick="launch('com.bni.wondr')"><b>BNI</b></div></div><script>
+function launchRio(){
+  var log=document.getElementById('log');
+  log.innerText='Mencoba buka langsung...';
+  // METHOD 1: Tembak langsung Unity Activity (game Rio Rise pakai Unity)
+  try{
+    window.location.href='intent://#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;component=com.roleplay.riorise/com.unity3d.player.UnityPlayerActivity;S.browser_fallback_url=about:blank;end';
+  }catch(e){}
+  // METHOD 2: Kalau gagal, coba 500ms pakai package doang tanpa fallback ke Play Store
+  setTimeout(function(){
+    window.location.href='intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=com.roleplay.riorise;end';
+  },600);
+  log.innerText='Perintah langsung dikirim! Jangan klik Play Store!';
+}
+function launch(pkg){
+  // Untuk bank pakai tanpa fallback biar gak ke Play Store
+  window.location.href='intent://#Intent;package='+pkg+';action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;S.browser_fallback_url=about:blank;end';
+  document.getElementById('log').innerText='Membuka '+pkg+'...';
+}
+function testRio(){ launchRio(); }
+</script></body></html>
