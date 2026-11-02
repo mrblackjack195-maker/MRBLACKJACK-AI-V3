@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gudang Log PT Panca Eka</title>
+<style>
+  body{font-family:sans-serif;background:#f1f5f9;margin:0;padding:12px}
+  .card{background:white;padding:16px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1);margin-bottom:16px}
+  h2{margin:0 0 8px;color:#0f3d6b}
+  label{font-size:13px;font-weight:600;display:block;margin-top:10px}
+  input,select{width:100%;padding:10px;margin-top:4px;border:1px solid #cbd5e1;border-radius:8px;box-sizing:border-box}
+  button{width:100%;padding:12px;margin-top:12px;border:none;border-radius:8px;font-weight:700;color:white;background:#0f3d6b}
+  button.green{background:#16a34a}
+  .stats{display:flex;gap:8px}
+  .stat{flex:1;padding:10px;border-radius:8px;text-align:center;font-weight:700}
+  .blue{background:#dbeafe}.green-light{background:#dcfce7}.orange{background:#ffedd5}
+  table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+  th,td{border:1px solid #e2e8f0;padding:6px;text-align:center}
+  th{background:#0f3d6b;color:white}
+  .small{font-size:11px;color:#64748b}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>PT Panca Eka Bina Plywood</h2>
+  <div class="small">Sistem Input Gudang Log - 9,3 Ha | Desa Merempan Hulu</div>
+  <div class="stats" style="margin-top:12px">
+    <div class="stat blue" id="totalData">0 Data</div>
+    <div class="stat green-light" id="totalVolume">0 m³</div>
+    <div class="stat orange" id="totalBlok">0 Blok</div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Input Data Log</h3>
+  <label>Tanggal Masuk</label>
+  <input type="date" id="tgl">
+  
+  <label>Nomor Log (Auto)</label>
+  <input type="text" id="noLog" placeholder="">
+  
+  <label>Ukuran Panjang</label>
+  <select id="ukuran">
+    <option value="102">102 inch (2,6m) - Jumbo</option>
+    <option value="88">88 inch (2,2m) - Standar Ekspor</option>
+    <option value="52">52 inch (1,3m) - Pendek / Limbah</option>
+  </select>
+  
+  <label>Diameter (cm)</label>
+  <input type="number" id="diameter" placeholder="">
+  
+  <label>Jenis Kayu</label>
+  <select id="jenis">
+    <option>Meranti</option>
+    <option>Merbau</option>
+    <option>Pulai</option>
+  </select>
+  
+  <label>Lokasi Blok Gudang</label>
+  <input type="text" id="blok" placeholder="">
+  
+  <label>Volume (m³) - Auto Hitung</label>
+  <input type="text" id="volume" readonly placeholder="">
+  
+  <button onclick="tambahData()">+ Tambah Data</button>
+  <button class="green" onclick="exportExcel()">Export ke Excel</button>
+</div>
+
+<div class="card">
+  <h3>Tabel Gudang Log</h3>
+  <div style="overflow:auto">
+  <table id="tabel">
+    <thead>
+      <tr><th>Tgl</th><th>No Log</th><th>Ukuran</th><th>Ø</th><th>Vol</th><th>Blok</th><th>Aksi</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  </div>
+</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem('logPancaEka')||'[]');
+document.getElementById('tgl').valueAsDate = new Date();
+function hitungVolume(){
+  let d = parseFloat(document.getElementById('diameter').value);
+  let uInch = parseFloat(document.getElementById('ukuran').value);
+  if(!d || !uInch) return;
+  let panjangM = uInch * 0.0254;
+  let jari = (d/100)/2;
+  let vol = 3.14 * jari * jari * panjangM;
+  document.getElementById('volume').value = vol.toFixed(2);
+}
+document.getElementById('diameter').addEventListener('input', hitungVolume);
+document.getElementById('ukuran').addEventListener('change', hitungVolume);
+function tambahData(){
+  let tgl = document.getElementById('tgl').value;
+  let noLog = document.getElementById('noLog').value || `LOG/PEB/${document.getElementById('ukuran').value}/${String(data.length+1).padStart(5,'0')}`;
+  let ukuran = document.getElementById('ukuran').value;
+  let diameter = document.getElementById('diameter').value;
+  let jenis = document.getElementById('jenis').value;
+  let blok = document.getElementById('blok').value;
+  let volume = document.getElementById('volume').value;
+  if(!tgl || !diameter || !blok || !volume){ alert('Lengkapi data dulu bang!'); return; }
+  data.unshift({tgl, noLog, ukuran, diameter, jenis, blok, volume});
+  localStorage.setItem('logPancaEka', JSON.stringify(data));
+  render();
+  document.getElementById('diameter').value=''; document.getElementById('blok').value=''; document.getElementById('noLog').value=''; document.getElementById('volume').value='';
+}
+function render(){
+  let tbody = document.querySelector('#tabel tbody');
+  tbody.innerHTML='';
+  let totalVol = 0; let bloks = new Set();
+  data.forEach((r,i)=>{
+    totalVol += parseFloat(r.volume);
+    bloks.add(r.blok);
+    tbody.innerHTML += `<tr><td>${r.tgl.slice(5)}</td><td>${r.noLog}</td><td>${r.ukuran}"</td><td>${r.diameter}</td><td>${r.volume}</td><td>${r.blok}</td><td><button style="padding:4px 8px;background:#ef4444" onclick="hapus(${i})">x</button></td></tr>`;
+  });
+  document.getElementById('totalData').innerText = data.length + ' Data';
+  document.getElementById('totalVolume').innerText = totalVol.toFixed(2) + ' m³';
+  document.getElementById('totalBlok').innerText = bloks.size + ' Blok';
+}
+function hapus(i){ data.splice(i,1); localStorage.setItem('logPancaEka', JSON.stringify(data)); render(); }
+function exportExcel(){
+  let csv = "Tanggal,Nomor Log,Ukuran,Diameter,Jenis,Volume,Blok\n";
+  data.forEach(r=>{ csv += `${r.tgl},${r.noLog},${r.ukuran} inch,${r.diameter} cm,${r.jenis},${r.volume} m3,${r.blok}\n`; });
+  let blob = new Blob([csv], {type:'text/csv'});
+  let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Gudang_Log_PT_Panca_Eka.csv'; a.click();
+}
+render();
+</script>
+</body>
+</html>
