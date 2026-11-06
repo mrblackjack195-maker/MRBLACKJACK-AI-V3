@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gudang Log PT Panca Eka - 1995-2026</title>
+  <br>
+  <tittle>DIBUAT OLEH : RYAN HIDAYAT</tittle>
+</br>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+body{background:#eef2f7;color:#111;padding:12px}
+.top{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
+.top h1{font-size:22px;color:#0a2e6b;line-height:1.2}
+.top p{font-size:13px;color:#666;margin-top:4px}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
+.stat{border-radius:12px;padding:12px;text-align:center}
+.stat b{font-size:18px;display:block;color:#0a2e6b}
+.stat span{font-size:12px;color:#444}
+.blue{background:#dbeafe}.green{background:#dcfce7}.orange{background:#ffedd5}
+.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
+.card h2{font-size:19px;margin-bottom:8px}
+.card .sub{font-size:12px;color:#666;margin-bottom:12px}
+label{font-size:14px;display:block;margin:10px 0 5px}
+input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;background:#f9fafb;outline:none;font-size:15px}
+.btn{width:100%;background:#0a2e6b;color:#fff;border:none;padding:14px;border-radius:10px;font-size:16px;font-weight:bold;margin-top:14px}
+.btn2{background:#16a34a;color:#fff;border:none;padding:10px 14px;border-radius:8px;font-weight:bold}
+.chip{padding:8px 12px;border-radius:20px;border:1px solid #ddd;background:#fff;font-weight:bold;cursor:pointer;font-size:13px}
+.chip.on{background:#0a2e6b;color:#fff;border-color:#0a2e6b}
+.chip.on2{background:#dc2626;color:#fff;border-color:#dc2626}
+.search{width:100%;padding:11px;border-radius:10px;border:1px solid #ddd;margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:760px}
+table.total{min-width:100%}
+th{background:#f1f5f9;padding:10px;text-align:left;white-space:nowrap}
+td{padding:10px;border-bottom:1px solid #eee;white-space:nowrap}
+.wrap{overflow-x:auto;max-height:420px;overflow-y:auto}
+.wrap2{overflow-x:auto}
+.badge{padding:4px 8px;border-radius:20px;font-size:11px;font-weight:bold;color:#fff}
+.tersimpan{background:#16a34a}.terverifikasi{background:#2563eb}.diproses{background:#eab308;color:#000}.selesai{background:#059669}.menunggu{background:#f97316}
+.del{background:#fee2e2;border:none;padding:6px 10px;border-radius:8px;cursor:pointer}
+.foot{text-align:center;font-size:11px;color:#888;margin:10px 0 30px}
+.flex{display:flex;gap:8px}
+.flex>*{flex:1}
+.bar{height:14px;background:#eee;border-radius:10px;overflow:hidden;margin:4px 0 10px}
+.bar i{display:block;height:100%;background:#0a2e6b}
+.rowTahun{display:flex;justify-content:space-between;font-size:13px}
+canvas{width:100%;height:280px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;touch-action:manipulation}
+canvas.trend{height:300px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;margin:10px 0}
+.dot{width:12px;height:12px;border-radius:3px;display:inline-block;vertical-align:middle}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.kpi div{background:#f8fafc;border:1px solid #eee;border-radius:10px;padding:10px;text-align:center}
+.kpi b{font-size:16px;color:#0a2e6b;display:block}
+.kpi span{font-size:11px;color:#666}
+.kpi div.naik b{color:#16a34a}.kpi div.turun b{color:#dc2626}
+tr.pilih{background:#dbeafe!important}
+.trendBox{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin-top:10px}
+.trendBox b{color:#0a2e6b}
+.up{color:#16a34a;font-weight:bold}.down{color:#dc2626;font-weight:bold}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>PT Panca Eka Bina Plywood Industry</h1>
+  <p>Gudang Log - Desa Merempan Hulu, Siak - 9,3 Ha<br>Arsip Data: <b>1995 - 2026</b></p>
+  <div class="stats">
+    <div class="stat blue"><b id="totalData">-</b><span>Total Data</span></div>
+    <div class="stat green"><b id="totalVol">-</b><span>Total Volume (m³)</span></div>
+    <div class="stat orange"><b id="totalBlok">-</b><span>Blok Aktif</span></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>📊 Total Per Tahun + Grafik Batang</h2>
+  <p class="sub">Klik batang untuk filter tabel ke tahun itu.</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+    <button class="chip on" id="chipVol" onclick="setMode('vol')">📦 Volume (m³)</button>
+    <button class="chip" id="chipJml" onclick="setMode('jml')">📋 Jumlah Data</button>
+    <button class="chip" onclick="setTahun(1995,2026)">Semua 1995-2026</button>
+    <button class="chip" onclick="setTahun(2024,2024)">Hanya 2024 Asli</button>
+  </div>
+  <div style="overflow-x:auto"><canvas id="chart" width="1000" height="280"></canvas></div>
+  <p id="chartInfo" style="font-size:13px;font-weight:bold;color:#0a2e6b;margin-top:8px">👆 Klik batang untuk lihat detail tahun</p>
+  <div class="legend"><span><i class="dot" style="background:#0a2e6b"></i> Biasa</span><span><i class="dot" style="background:#16a34a"></i> 2024 Asli</span><span><i class="dot" style="background:#f59e0b"></i> Dipilih</span><span><i class="dot" style="background:#94a3b8"></i> 2026 Berjalan</span></div>
+
+  <h2 style="margin-top:18px">📈 Grafik Garis / Trend 1995 - 2026</h2>
+  <p class="sub">Garis biru = Volume asli per tahun. Garis merah putus-putus = Garis Trend (rata-rata jalan).</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+    <button class="chip on" id="chipTrendVol" onclick="setTrendMode('vol')">Trend Volume</button>
+    <button class="chip" id="chipTrendJml" onclick="setTrendMode('jml')">Trend Jumlah Data</button>
+    <button class="chip" id="chipTrendShow" onclick="toggleTrendLine()">Garis Trend: ON</button>
+  </div>
+  <div style="overflow-x:auto"><canvas id="chartTrend" class="trend" width="1000" height="300"></canvas></div>
+  <p id="trendInfo" style="font-size:13px;font-weight:bold;color:#0a2e6b;margin-top:8px">👆 Klik titik di garis untuk lihat naik / turunnya</p>
+
+  <div class="trendBox" id="analisaTrend">Menghitung trend...</div>
+
+  <div class="kpi">
+    <div><b id="kpiTertinggi">-</b><span>🏆 Tahun Volume Tertinggi</span></div>
+    <div><b id="kpiRata">-</b><span>📈 Rata-rata / Tahun</span></div>
+    <div><b id="kpiNaik">-</b><span>📊 Kenaikan 1995 → 2026</span></div>
+    <div id="kpiTrendBox"><b id="kpiTrend">-</b><span>📈 Trend: Naik / Turun / Stabil</span></div>
+  </div>
+
+  <label style="margin-top:14px">Tabel Total Per Tahun + Naik / Turun</label>
+  <div class="wrap2"><table class="total"><thead><tr><th>Tahun</th><th>Jumlah</th><th>Total Volume</th><th>Naik / Turun vs Tahun Lalu</th><th>% Naik / Turun</th><th>Trend</th><th>Lihat</th></tr></thead><tbody id="tbodyTotal"></tbody></table></div>
+</div>
+
+<div class="card">
+  <h2>📅 Filter Tahun</h2>
+  <div class="flex"><div><label>Dari Tahun</label><select id="dariTahun" onchange="tampil()"></select></div><div><label>Sampai Tahun</label><select id="sampaiTahun" onchange="tampil()"></select></div></div>
+  <label style="margin-top:14px">Rekap Cepat Per Tahun</label><div id="rekapTahun"></div>
+</div>
+
+<div class="card">
+  <h2>Input Data Log Baru</h2>
+  <label>Tanggal Masuk</label><input type="date" id="tanggal">
+  <label>Nomor Log (Auto)</label><input type="text" id="nomor">
+  <div class="flex"><div><label>Ukuran Panjang</label><select id="panjang"><option value="102">102 inch</option><option value="88">88 inch</option><option value="52">52 inch</option></select></div><div><label>Diameter (cm)</label><input type="number" id="diameter" oninput="hitungVolume()"></div></div>
+  <div class="flex"><div><label>Jenis Kayu</label><select id="jenis"><option>Meranti</option><option>Pulai</option><option>Merbau</option><option>Kruing</option><option>Acacia</option></select></div><div><label>Lokasi Blok</label><input type="text" id="blok"></div></div>
+  <label>Volume (m³) - Auto</label><input type="text" id="volume" readonly>
+  <label>Status</label><select id="status"><option>Tersimpan</option><option>Terverifikasi</option><option>Diproses</option><option>Selesai</option><option>Menunggu</option></select>
+  <button class="btn" onclick="tambahData()">+ Tambah Data</button>
+</div>
+
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h2>Tabel Gudang Log</h2><button class="btn2" onclick="exportExcel()">⬇ Export Excel</button></div>
+  <input class="search" id="cari" placeholder="🔍 Cari nomor log, blok, tahun, status..." oninput="tampil()">
+  <div class="wrap"><table><thead><tr><th>Tanggal</th><th>Tahun</th><th>Nomor Log</th><th>Ukuran</th><th>Diameter</th><th>Jenis</th><th>Volume</th><th>Blok</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tbody"></tbody></table></div>
+</div>
+<p class="foot">© 1995-2026 PT Panca Eka Bina Plywood Industry • Data diperbarui: 07 Okt 2024 15:22 WIB</p>
+
+<script>
+let dataAsli=[
+ {tanggal:"2024-10-07", nomor:"LOG/PEB/102/00124", panjang:"102", diameter:45, jenis:"Meranti", volume:6.12, blok:"Blok A-12", status:"Tersimpan", asli:true},
+ {tanggal:"2024-10-07", nomor:"LOG/PEB/088/00125", panjang:"88", diameter:38, jenis:"Meranti", volume:4.75, blok:"Blok B-05", status:"Terverifikasi", asli:true},
+ {tanggal:"2024-10-06", nomor:"LOG/PEB/052/00123", panjang:"52", diameter:32, jenis:"Meranti", volume:3.28, blok:"Blok C-09", status:"Diproses", asli:true},
+ {tanggal:"2024-10-06", nomor:"LOG/PEB/102/00122", panjang:"102", diameter:50, jenis:"Meranti", volume:7.20, blok:"Blok A-14", status:"Selesai", asli:true},
+ {tanggal:"2024-10-05", nomor:"LOG/PEB/088/00121", panjang:"88", diameter:36, jenis:"Meranti", volume:3.51, blok:"Blok B-07", status:"Menunggu", asli:true},
+];
+function buatSimulasi(){
+ let arr=[...dataAsli]; let jenisArr=["Meranti","Meranti","Meranti","Pulai","Merbau","Kruing","Acacia"]; let statusArr=["Selesai","Terverifikasi","Tersimpan","Diproses","Menunggu"]; let blokArr=["Blok A","Blok B","Blok C"]; let no=1;
+ for(let th=1995; th<=2026; th++){ if(th===2024) continue; let jumlah=th<2000?3:th<2010?4:5; for(let i=0;i<jumlah;i++){ let panjang=[102,88,52][i%3]; let diameter=30+((th+i*7)%25); let vol=(0.7854*Math.pow(diameter/100,2)*(panjang*0.0254)*1.85).toFixed(2); let faktor=1+(th-1995)*0.02; vol=(parseFloat(vol)*faktor).toFixed(2); let bulan=String(1+((i*3+th)%12)).padStart(2,'0'); let hari=String(5+((i*5)%20)).padStart(2,'0'); arr.push({tanggal:`${th}-${bulan}-${hari}`, nomor:`LOG/PEB/${panjang}/${String(th).slice(2)}${String(no).padStart(3,'0')}`, panjang:String(panjang), diameter:diameter, jenis:jenisArr[(th+i)%jenisArr.length], volume:parseFloat(vol), blok:`${blokArr[(th+i)%3]}-${String(1+((th+i)%15)).padStart(2,'0')}`, status:statusArr[(th+i)%5], asli:false}); no++; } }
+ return arr.sort((a,b)=> b.tanggal.localeCompare(a.tanggal));
+}
+let data=[]; let simpan=localStorage.getItem('log_peb_1995_2026');
+if(simpan){ data=JSON.parse(simpan); } else { data=buatSimulasi(); localStorage.setItem('log_peb_1995_2026', JSON.stringify(data)); }
+function save(){ localStorage.setItem('log_peb_1995_2026', JSON.stringify(data)); }
+function formatTgl(t){ let d=new Date(t); return d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}); }
+let dariEl=document.getElementById('dariTahun'), sampaiEl=document.getElementById('sampaiTahun');
+for(let th=1995; th<=2026; th++){ dariEl.innerHTML+=`<option value="${th}">${th}</option>`; sampaiEl.innerHTML+=`<option value="${th}">${th}</option>`; }
+dariEl.value=1995; sampaiEl.value=2026;
+let mode='vol'; let trendMode='vol'; let showTrendLine=true; let tahunDipilih=null;
+function setMode(m){ mode=m; document.getElementById('chipVol').classList.toggle('on',m==='vol'); document.getElementById('chipJml').classList.toggle('on',m==='jml'); tampil(); }
+function setTrendMode(m){ trendMode=m; document.getElementById('chipTrendVol').classList.toggle('on',m==='vol'); document.getElementById('chipTrendJml').classList.toggle('on',m==='jml'); tampil(); }
+function toggleTrendLine(){ showTrendLine=!showTrendLine; document.getElementById('chipTrendShow').innerText = showTrendLine? "Garis Trend: ON":"Garis Trend: OFF"; document.getElementById('chipTrendShow').classList.toggle('on2',!showTrendLine); tampil(); }
+function setTahun(a,b){ dariEl.value=a; sampaiEl.value=b; tahunDipilih=(a===b? String(a):null); tampil(); }
+function hitungVolume(){ let d=parseFloat(document.getElementById('diameter').value); let p=parseFloat(document.getElementById('panjang').value); if(!d||!p) return; let vol=0.7854*Math.pow(d/100,2)*(p*0.0254)*1.85; document.getElementById('volume').value=vol.toFixed(2); document.getElementById('nomor').value=`LOG/PEB/${p}/00${126+data.length}`; }
+function hitungPerTahun(){ let per={}; data.forEach(x=>{ let th=x.tanggal.slice(0,4); if(!per[th]) per[th]={tahun:th,jml:0,vol:0,jenis:{},asliCount:0}; per[th].jml++; per[th].vol+=parseFloat(x.volume); per[th].jenis[x.jenis]=(per[th].jenis[x.jenis]||0)+1; if(x.asli) per[th].asliCount++; }); return Object.values(per).sort((a,b)=>a.tahun-b.tahun); }
+function gambarGrafik(){
+ let canvas=document.getElementById('chart'); let ctx=canvas.getContext('2d'); let list=hitungPerTahun(); ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle="#f8fafc"; ctx.fillRect(0,0,canvas.width,canvas.height);
+ let maxVal=Math.max(...list.map(v=> mode==='vol'? v.vol:v.jml),1); let left=50,right=20,top=30,bottom=45; let chartW=canvas.width-left-right, chartH=canvas.height-top-bottom; let barW=chartW/list.length;
+ ctx.strokeStyle="#e2e8f0"; ctx.fillStyle="#64748b"; ctx.font="11px Arial"; ctx.textAlign="right";
+ for(let i=0;i<=4;i++){ let y=top+chartH-(chartH/4*i); ctx.beginPath(); ctx.moveTo(left,y); ctx.lineTo(canvas.width-right,y); ctx.stroke(); ctx.fillText(mode==='vol'? (maxVal/4*i).toFixed(0)+" m³":(maxVal/4*i).toFixed(0), left-5, y+4); }
+ window._barPos=[];
+ list.forEach((v,i)=>{ let val=mode==='vol'? v.vol:v.jml; let h=chartH*(val/maxVal); let x=left+i*barW+barW*0.18; let w=barW*0.64; let y=top+chartH-h; let color="#0a2e6b"; if(v.tahun==="2024") color="#16a34a"; if(v.tahun==="2026") color="#94a3b8"; if(tahunDipilih===v.tahun) color="#f59e0b"; ctx.fillStyle=color; ctx.beginPath(); ctx.roundRect(x,y,w,h,6); ctx.fill(); ctx.fillStyle="#0f172a"; ctx.font="bold 11px Arial"; ctx.textAlign="center"; ctx.fillText(mode==='vol'? v.vol.toFixed(1):v.jml, x+w/2, y-6); ctx.fillStyle=tahunDipilih===v.tahun? "#b45309":"#334155"; ctx.font=(tahunDipilih===v.tahun?"bold 11px Arial":"11px Arial"); ctx.fillText(v.tahun, x+w/2, top+chartH+18); window._barPos.push({x:x,w:w,tahun:v.tahun}); });
+ ctx.fillStyle="#0a2e6b"; ctx.font="bold 13px Arial"; ctx.textAlign="left"; ctx.fillText(mode==='vol'? "Volume Log per Tahun (m³) - 1995-2026":"Jumlah Data Log per Tahun - 1995-2026", left, 18);
+}
+function gambarTrend(){
+ let canvas=document.getElementById('chartTrend'); let ctx=canvas.getContext('2d'); let list=hitungPerTahun();
+ ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle="#fff"; ctx.fillRect(0,0,canvas.width,canvas.height);
+ let vals=list.map(v=> trendMode==='vol'? v.vol:v.jml);
+ let maxVal=Math.max(...vals,1); let minVal=Math.min(...vals,0)*0.85;
+ let left=55,right=25,top=35,bottom=45; let chartW=canvas.width-left-right, chartH=canvas.height-top-bottom;
+ ctx.strokeStyle="#e2e8f0"; ctx.fillStyle="#64748b"; ctx.font="11px Arial"; ctx.textAlign="right";
+ for(let i=0;i<=4;i++){ let y=top+chartH-(chartH/4*i); ctx.beginPath(); ctx.moveTo(left,y); ctx.lineTo(canvas.width-right,y); ctx.stroke(); let val=minVal+(maxVal-minVal)/4*i; ctx.fillText(trendMode==='vol'? val.toFixed(0)+" m³":val.toFixed(0), left-5, y+4); }
+ let points=list.map((v,i)=>{ let val=trendMode==='vol'? v.vol:v.jml; let x=left + (chartW/(list.length-1))*i; let y=top+chartH - ((val-minVal)/(maxVal-minVal))*chartH; return {x,y,val,tahun:v.tahun}; });
+ ctx.beginPath(); ctx.moveTo(points[0].x, top+chartH); points.forEach(p=>ctx.lineTo(p.x,p.y)); ctx.lineTo(points[points.length-1].x, top+chartH); ctx.closePath(); ctx.fillStyle="rgba(10,46,107,0.08)"; ctx.fill();
+ if(showTrendLine){
+   let n=list.length; let sumX=0,sumY=0,sumXY=0,sumXX=0; vals.forEach((y,i)=>{ sumX+=i; sumY+=y; sumXY+=i*y; sumXX+=i*i; });
+   let slope=(n*sumXY-sumX*sumY)/(n*sumXX-sumX*sumX); let intercept=(sumY-slope*sumX)/n;
+   ctx.strokeStyle="#dc2626"; ctx.setLineDash([8,6]); ctx.lineWidth=2; ctx.beginPath();
+   let y1=top+chartH - (((intercept)-minVal)/(maxVal-minVal))*chartH;
+   let y2=top+chartH - (((intercept+slope*(n-1))-minVal)/(maxVal-minVal))*chartH;
+   ctx.moveTo(points[0].x, y1); ctx.lineTo(points[points.length-1].x, y2); ctx.stroke(); ctx.setLineDash([]);
+   ctx.fillStyle="#dc2626"; ctx.font="bold 11px Arial"; ctx.textAlign="left"; ctx.fillText("— — Garis Trend (Naik)", left+10, 18);
+ }
+ ctx.strokeStyle="#0a2e6b"; ctx.lineWidth=3; ctx.lineJoin="round"; ctx.beginPath(); points.forEach((p,i)=>{ if(i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); }); ctx.stroke();
+ window._trendPos=[];
+ points.forEach((p,i)=>{
+   let isNaik = i>0 ? p.val > points[i-1].val : true;
+   let color="#0a2e6b"; if(p.tahun==="2024") color="#16a34a"; if(tahunDipilih===p.tahun) color="#f59e0b";
+   ctx.fillStyle=color; ctx.beginPath(); ctx.arc(p.x,p.y,7,0,Math.PI*2); ctx.fill();
+   ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(p.x,p.y,3,0,Math.PI*2); ctx.fill();
+   ctx.fillStyle="#0f172a"; ctx.font="bold 11px Arial"; ctx.textAlign="center";
+   ctx.fillText(trendMode==='vol'? p.val.toFixed(1):p.val, p.x, p.y-14);
+   if(i>0){ ctx.font="bold 12px Arial"; ctx.fillStyle=isNaik? "#16a34a":"#dc2626"; ctx.fillText(isNaik? "▲":"▼", p.x, p.y+22); }
+   ctx.fillStyle=tahunDipilih===p.tahun? "#b45309":"#334155"; ctx.font=(tahunDipilih===p.tahun?"bold 11px Arial":"11px Arial"); ctx.fillText(p.tahun, p.x, top+chartH+20);
+   window._trendPos.push({x:p.x,y:p.y,tahun:p.tahun,val:p.val,prev: i>0? points[i-1].val:null});
+ });
+ ctx.fillStyle="#0a2e6b"; ctx.font="bold 13px Arial"; ctx.textAlign="left"; ctx.fillText(trendMode==='vol'? "Trend Volume (m³) 1995-2026":"Trend Jumlah Data 1995-2026", left, 18);
+}
+document.getElementById('chart').addEventListener('click', function(e){ let rect=this.getBoundingClientRect(); let scaleX=this.width/rect.width; let x=(e.clientX-rect.left)*scaleX; let found=(window._barPos||[]).find(b=> x>=b.x && x<=b.x+b.w); if(found){ tahunDipilih=found.tahun; setTahun(parseInt(found.tahun),parseInt(found.tahun)); document.getElementById('chartInfo').innerText=`Tahun ${found.tahun} dipilih`; } });
+document.getElementById('chartTrend').addEventListener('click', function(e){
+ let rect=this.getBoundingClientRect(); let sx=this.width/rect.width; let sy=this.height/rect.height; let x=(e.clientX-rect.left)*sx; let y=(e.clientY-rect.top)*sy;
+ let found=(window._trendPos||[]).find(p=> Math.abs(x-p.x)<22 && Math.abs(y-p.y)<22);
+ if(found){
+   tahunDipilih=found.tahun; setTahun(parseInt(found.tahun),parseInt(found.tahun));
+   let diff = found.prev!==null ? (found.val-found.prev) : 0; let persen = found.prev? ((diff/found.prev)*100).toFixed(1):"0";
+   let naik = diff>=0;
+   document.getElementById('trendInfo').innerText = `${found.tahun}: ${trendMode==='vol'? found.val.toFixed(2)+" m³":found.val+" data"} ${found.prev!==null? (naik? `▲ NAIK +${diff.toFixed(2)} (+${persen}%) dari tahun lalu`:`▼ TURUN ${diff.toFixed(2)} (${persen}%) dari tahun lalu`):""}`;
+ }
+});
+function tampil(){
+ let dari=parseInt(dariEl.value), sampai=parseInt(sampaiEl.value); let cari=document.getElementById('cari').value.toLowerCase();
+ let filtered=data.filter(x=>{ let th=parseInt(x.tanggal.slice(0,4)); return th>=dari && th<=sampai && (x.nomor+" "+x.blok+" "+x.status+" "+x.jenis+" "+th).toLowerCase().includes(cari); });
+ let tbody=document.getElementById('tbody'); tbody.innerHTML="";
+ filtered.slice(0,200).forEach(x=>{ let idx=data.indexOf(x); let cls=x.status.toLowerCase(); tbody.innerHTML+=`<tr><td>${formatTgl(x.tanggal)}</td><td><b>${x.tanggal.slice(0,4)}</b></td><td><b>${x.nomor}</b></td><td>${x.panjang} inch</td><td>${x.diameter} cm</td><td>${x.jenis}</td><td><b>${parseFloat(x.volume).toFixed(2)}</b></td><td>${x.blok}</td><td><span class="badge ${cls}">${x.status}</span></td><td><button class="del" onclick="hapus(${idx})">🗑️</button></td></tr>`; });
+ let totalVol=filtered.reduce((a,b)=>a+parseFloat(b.volume),0); let blokSet=[...new Set(filtered.map(x=>x.blok.charAt(5)))].filter(Boolean);
+ document.getElementById('totalData').innerText=filtered.length+" Data"; document.getElementById('totalVol').innerText=totalVol.toFixed(2)+" m³"; document.getElementById('totalBlok').innerText=blokSet.length+" Blok";
+ let rekap={}; filtered.forEach(x=>{ let th=x.tanggal.slice(0,4); if(!rekap[th]) rekap[th]={jml:0,vol:0}; rekap[th].jml++; rekap[th].vol+=parseFloat(x.volume); });
+ let maxVol=Math.max(...Object.values(rekap).map(v=>v.vol),1); let html=""; Object.keys(rekap).sort().forEach(th=>{ let persen=Math.round(rekap[th].vol/maxVol*100); html+=`<div class="rowTahun"><span><b>${th}</b> - ${rekap[th].jml} data</span><span>${rekap[th].vol.toFixed(2)} m³</span></div><div class="bar"><i style="width:${persen}%"></i></div>`; }); document.getElementById('rekapTahun').innerHTML=html||"Tidak ada data";
+ let per=hitungPerTahun(); let tbodyTotal=document.getElementById('tbodyTotal'); tbodyTotal.innerHTML="";
+ per.slice().reverse().forEach((v,idx,arr)=>{
+   let asliArr=per.slice().sort((a,b)=>a.tahun-b.tahun); let pos=asliArr.findIndex(z=>z.tahun===v.tahun); let prev=pos>0? asliArr[pos-1]:null;
+   let diff=prev? (v.vol-prev.vol):0; let persen=prev? ((diff/prev.vol)*100).toFixed(1):"0"; let naik=diff>=0;
+   tbodyTotal.innerHTML+=`<tr class="${tahunDipilih===v.tahun?'pilih':''}" onclick="tahunDipilih='${v.tahun}';setTahun(${v.tahun},${v.tahun})" style="cursor:pointer"><td><b>${v.tahun}</b></td><td>${v.jml}</td><td><b>${v.vol.toFixed(2)} m³</b></td><td class="${prev? (naik?'up':'down'):''}">${prev? (naik? `▲ +${diff.toFixed(2)}`:`▼ ${diff.toFixed(2)}`):"-"}</td><td class="${prev? (naik?'up':'down'):''}">${prev? (naik? `+${persen}%`:`${persen}%`):"-"}</td><td>${prev? (naik?'📈 Naik':'📉 Turun'):'— Awal'}</td><td><button class="btn2" style="padding:6px 10px">Lihat →</button></td></tr>`;
+ });
+ let tert=per.reduce((a,b)=> b.vol>a.vol?b:a, per[0]); let totalSemua=per.reduce((a,b)=>a+b.vol,0); let rataTahun=totalSemua/per.length;
+ let vol1995=per.find(v=>v.tahun==="1995")?.vol||1; let vol2026=per.find(v=>v.tahun==="2026")?.vol||0; let naikPersen=((vol2026-vol1995)/vol1995*100).toFixed(0);
+ document.getElementById('kpiTertinggi').innerText=`${tert.tahun} - ${tert.vol.toFixed(2)} m³`; document.getElementById('kpiRata').innerText=`${rataTahun.toFixed(2)} m³ / Tahun`; document.getElementById('kpiNaik').innerText=`+${naikPersen}% dari 1995`;
+ let naikCount=0, turunCount=0; for(let i=1;i<per.length;i++){ if(per[i].vol>per[i-1].vol) naikCount++; else turunCount++; }
+ let trendText = naikCount>turunCount? "📈 TREND NAIK":"📉 TREND TURUN";
+ let trendDesc = naikCount>turunCount? `Dari 31 perbandingan tahun, <b>${naikCount} tahun NAIK</b> dan ${turunCount} tahun turun. Secara keseluruhan gudang berkembang naik dari ${vol1995.toFixed(2)} m³ (1995) ke ${vol2026.toFixed(2)} m³ (2026).` : `Dari 31 perbandingan, ${naikCount} naik dan ${turunCount} turun.`;
+ document.getElementById('kpiTrend').innerText=trendText; document.getElementById('kpiTrendBox').className = naikCount>turunCount? "naik":"turun";
+ document.getElementById('analisaTrend').innerHTML=`<b>🤖 Analisa Otomatis:</b><br>${trendDesc}<br><br>🏆 Puncak tertinggi di <b>${tert.tahun} (${tert.vol.toFixed(2)} m³)</b> • Rata-rata <b>${rataTahun.toFixed(2)} m³/tahun</b> • Total 32 tahun: <b>${totalSemua.toFixed(2)} m³</b>`;
+ gambarGrafik(); gambarTrend();
+}
+function tambahData(){ let tanggal=document.getElementById('tanggal').value || new Date().toISOString().slice(0,10); let nomor=document.getElementById('nomor').value; let panjang=document.getElementById('panjang').value; let diameter=document.getElementById('diameter').value; let jenis=document.getElementById('jenis').value; let blok=document.getElementById('blok').value; let volume=document.getElementById('volume').value; let status=document.getElementById('status').value; if(!diameter||!blok){ alert("Isi Diameter & Blok dulu bang!"); return; } if(!volume){ hitungVolume(); volume=document.getElementById('volume').value; } data.unshift({tanggal,nomor:nomor||`LOG/PEB/${panjang}/00${126+data.length}`,panjang,diameter,jenis,volume:parseFloat(volume),blok,status,asli:true}); save(); tampil(); alert("Data "+tanggal.slice(0,4)+" berhasil ditambah! Grafik langsung update."); }
+function hapus(i){ if(confirm("Hapus "+data[i].nomor+" ?")){ data.splice(i,1); save(); tampil(); } }
+function exportExcel(){ let dari=parseInt(dariEl.value), sampai=parseInt(sampaiEl.value); let csv="Tanggal,Tahun,Nomor Log,Ukuran,Diameter,Jenis,Volume,Blok,Status,Keterangan\n"; data.filter(x=>{let th=parseInt(x.tanggal.slice(0,4)); return th>=dari&&th<=sampai}).forEach(x=>{ csv+=`${x.tanggal},${x.tanggal.slice(0,4)},${x.nomor},${x.panjang},${x.diameter},${x.jenis},${x.volume},${x.blok},${x.status},${x.asli?'ASLI':'SIMULASI'}\n`; }); csv+="\nTOTAL PER TAHUN + TREND\nTahun,Jumlah,Total Volume,Naik/Turun,Persen\n"; let per=hitungPerTahun(); per.forEach((v,i)=>{ let prev=i>0? per[i-1]:null; let diff=prev? (v.vol-prev.vol).toFixed(2):""; let persen=prev? (((v.vol-prev.vol)/prev.vol)*100).toFixed(1):""; csv+=`${v.tahun},${v.jml},${v.vol.toFixed(2)},${diff},${persen}\n`; }); let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`Gudang_Log_PEB_${dari}-${sampai}_Trend.csv`; a.click(); }
+document.getElementById('tanggal').valueAsDate=new Date(); tampil();
+</script>
+</body>
+  <br></br>
+  
+</html>
